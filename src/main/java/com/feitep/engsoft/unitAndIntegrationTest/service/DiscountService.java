@@ -1,3 +1,4 @@
+// src/main/java/com/feitep/engsoft/unitAndIntegrationTest/service/DiscountService.java
 package com.feitep.engsoft.unitAndIntegrationTest.service;
 
 import com.feitep.engsoft.unitAndIntegrationTest.entity.Order;
@@ -5,30 +6,35 @@ import com.feitep.engsoft.unitAndIntegrationTest.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class DiscountService {
 
     private final OrderRepository repository;
-    private final List<DiscountStrategy> strategies;
 
     public DiscountService(OrderRepository repository) {
         this.repository = repository;
-        this.strategies = List.of(
-                new NoDiscountStrategy(),
-                new FivePercentStrategy(),
-                new TenPercentStrategy(),
-                new FifteenPercentStrategy()
-        );
     }
 
     @Transactional
-    public double applyDiscount(double total) {
-        DiscountStrategy strat = strategies.stream()
-                .filter(s -> s.supports(total))
-                .findFirst()
-                .orElseThrow();
+    public double applyDiscount(double total, int tier) {
+        DiscountStrategy strat;
+
+        switch (tier) {
+            case 1:
+                strat = new NoDiscountStrategy();
+                break;
+            case 2:
+                strat = new FivePercentStrategy();
+                break;
+            case 3:
+                strat = new TenPercentStrategy();
+                break;
+            case 4:
+                strat = new FifteenPercentStrategy();
+                break;
+            default:
+                throw new IllegalArgumentException("Tier inválido: deve ser entre 1 e 4");
+        }
 
         double discount = strat.discount(total);
         Order order = new Order(total - discount);
@@ -36,4 +42,3 @@ public class DiscountService {
         return discount;
     }
 }
-
