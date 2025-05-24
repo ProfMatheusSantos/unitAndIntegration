@@ -13,7 +13,7 @@ public class DiscountController {
     public DiscountController(DiscountService service) { this.service = service; }
 
     @GetMapping("/discount")
-    public double getDiscount(@RequestParam double amount) {
-        return service.applyDiscount(amount);
+    public double getDiscount(@RequestParam double amount, @RequestParam int tier) {
+        return service.applyDiscount(amount, tier);
     }
 }
